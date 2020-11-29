@@ -7,32 +7,37 @@ import apiClient from '../utilities/api_client';
 export default function SettingsScreen({ navigation }) {
 
   const [newsPosts, setNewsPosts] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const pageSize = 20;
 
   function loadNewsPosts() {
-    apiClient.get('/news_posts')
-    .then((newsPosts) => {
-      setNewsPosts(newsPosts.data);
+    apiClient.get(`/news_posts?limit=${pageSize}&offset=${offset}`)
+    .then((response) => {
+      setNewsPosts([...newsPosts, ...response.data]);
     })
   }
   
-  function renderNewsItem({ item, index }) {
-    const newsItem = item;
-
+  function renderNewsItem({ item: newsPost }) {
     const header = (props) => {
       return (
         <View {...props}>
-          <Text category='h6'>{newsItem.title}</Text>
+          <Text category='h6'>{newsPost.title}</Text>
         </View>
       );
     }
 
     return (
       <Card style={styles.newsPostCard} header={header}>
-        <Text appearance='hint'>{newsItem.body}</Text>
+        <Text appearance='hint'>{newsPost.body}</Text>
       </Card>
     );
   }
 
+  function handleListEndReached() {
+    setOffset(offset + pageSize);
+  }
+
+  useEffect(loadNewsPosts, [offset]);
   useEffect(loadNewsPosts, []);
 
 
@@ -44,6 +49,8 @@ export default function SettingsScreen({ navigation }) {
           style={styles.newsPostsList}
           data={newsPosts}
           renderItem={renderNewsItem}
+          onEndReached={handleListEndReached}
+          onEndReachedThreshold={1}
         />
       </SafeAreaView>
     </Layout>

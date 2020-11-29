@@ -4,7 +4,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import DashboardScreen from '../screens/DashboardScreen';
 import NewsScreen from '../screens/NewsScreen';
-import VacationScreen from '../screens/VacationScreen';
+import VacationNavigator from '../navigation/VacationNavigator';
 import AccountScreen from '../screens/AccountScreen';
 
 import { SafeAreaView } from 'react-native';
@@ -69,7 +69,7 @@ export default function SignedInDrawerLayout() {
       initialRouteName="Dashboard">
       <DrawerNavigator.Screen name="Dashboard" component={DashboardScreen} />
       <DrawerNavigator.Screen name="News" component={NewsScreen} />
-      <DrawerNavigator.Screen name="Vacation" component={VacationScreen} />
+      <DrawerNavigator.Screen name="Vacation" component={VacationNavigator} />
       <DrawerNavigator.Screen name="Account" component={AccountScreen} />
     </DrawerNavigator.Navigator>
   );

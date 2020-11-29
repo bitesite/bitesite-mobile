@@ -28,7 +28,7 @@ export default function SignInScreen({ onSignIn }) {
     })
     .catch((error) => {
       // TODO: Not signed in
-      console.log('failed');
+      console.log('sign in failed');
     });
   }
 
