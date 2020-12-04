@@ -1,7 +1,8 @@
 import axios from 'axios';
+import environment from './environment';
 
 const api_client = axios.create({
-  baseURL: 'http://localhost:3000/api/v1/',
+  baseURL: `${environment.apiHost}/api/v1/`,
   headers: {'Accept': 'application/json'},
 });
 

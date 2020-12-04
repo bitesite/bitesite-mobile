@@ -9,7 +9,7 @@ import UpdateSignedInContext from '../contexts/UpdateSignedInContext';
 import SignedInContext from '../contexts/SignedInContext';
 
 import SignInScreen from '../screens/SignInScreen';
-import SignedInDrawerLayout from '../navigation/SignedInDrawerLayout';
+import SignedInDrawerLayout from './SignedInDrawerLayout';
 
 export default function AuthorizationSwitcher() {
   const [checkingStatus, setCheckingStatus] = useState(true);
