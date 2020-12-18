@@ -4,9 +4,7 @@ import { View, SafeAreaView, StyleSheet } from 'react-native';
 function PaddedView({ style, children }) {
   return (
     <View style={{...styles.view, ...style}}>
-      <SafeAreaView>
-        {children}
-      </SafeAreaView>
+      {children}
     </View>
   );
 }

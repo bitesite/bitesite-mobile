@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import PaddedView from '../components/PaddedView';
 import {
   Field,
@@ -8,7 +8,6 @@ import {
 } from '../components/forms';
 
 import { 
-  Layout,
   Text,
   Button,
   RangeDatepicker,
@@ -16,12 +15,12 @@ import {
   SelectItem,
   IndexPath,
   Input,
-  Spinner,
 } from '@ui-kitten/components';
 
 import { railsParamsDate } from '../utilities/rails_helpers';
 
 import apiClient from '../utilities/api_client';
+import StandardScreenLayout from '../components/StandardScreenLayout';
 
 export default function TimeOffEntriesFormScreen({ navigation }) {
 
@@ -58,7 +57,7 @@ export default function TimeOffEntriesFormScreen({ navigation }) {
   }
 
   return (
-    <Layout style={styles.layout}>
+    <StandardScreenLayout>
       <PaddedView>
         <Text category='h1'>Book time off</Text>
         <Field>
@@ -106,7 +105,7 @@ export default function TimeOffEntriesFormScreen({ navigation }) {
           </Button>
         </Actions>
       </PaddedView>
-    </Layout>
+    </StandardScreenLayout>
   );
 }
 

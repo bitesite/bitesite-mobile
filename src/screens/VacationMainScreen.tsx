@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
-import { Button, Layout, Card, List, Text, useTheme } from '@ui-kitten/components';
+import React, { useState, useEffect, useCallback } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Button, Card, List, Text, useTheme } from '@ui-kitten/components';
 import ScreenHeader from '../components/ScreenHeader';
 import apiClient from '../utilities/api_client';
+import StandardScreenLayout from '../components/StandardScreenLayout';
 
 export default function VacationScreen({ navigation }) {
 
   const theme = useTheme();
 
+  const [refreshing, setRefreshing] = React.useState(false);
   const [timeOffEntries, setTimeOffEntries] = useState([]);
   const [offset, setOffset] = useState(0);
   const pageSize = 20;
@@ -16,9 +18,10 @@ export default function VacationScreen({ navigation }) {
     apiClient.get(`/time_off_entries?limit=${pageSize}&offset=${offset}`)
     .then((response) => {
       setTimeOffEntries([...timeOffEntries, ...response.data]);
+      setRefreshing(false);
     })
   }
-  
+
   function renderNewsItem({ item: timeOffEntry }) {
 
     let statusColor;
@@ -53,11 +56,16 @@ export default function VacationScreen({ navigation }) {
   useEffect(loadTimeOffEntries, [offset]);
   useEffect(loadTimeOffEntries, []);
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    loadTimeOffEntries();
+  }, []);
+
 
   return (
-    <Layout>
-      <SafeAreaView>
-        <ScreenHeader title='Vacation' navigation={navigation} />
+    <StandardScreenLayout>
+      <ScreenHeader title='Vacation' navigation={navigation} />
+      <View style={styles.screenBody}>
         <View style={styles.buttonContainer}>
           <Button
             color='primary'
@@ -72,13 +80,18 @@ export default function VacationScreen({ navigation }) {
           renderItem={renderNewsItem}
           onEndReached={handleListEndReached}
           onEndReachedThreshold={1}
+          onRefresh={onRefresh}
+          refreshing={refreshing}
         />
-      </SafeAreaView>
-    </Layout>
+      </View>
+    </StandardScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
+  screenBody: {
+    flex: 1,
+  },
   buttonContainer: {
     padding: 10,
   },
