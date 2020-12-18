@@ -1,13 +1,13 @@
 import React from 'react';
-import { SafeAreaView, View, StyleSheet } from 'react-native';
+import { View, SafeAreaView, StyleSheet } from 'react-native';
 
-function PaddedView({ children }) {
+function PaddedView({ style, children }) {
   return (
-    <SafeAreaView>
-      <View style={styles.view}>
+    <View style={{...styles.view, ...style}}>
+      <SafeAreaView>
         {children}
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 }
 

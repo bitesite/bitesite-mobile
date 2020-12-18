@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import PaddedView from '../components/PaddedView';
 import {
   Field,
@@ -58,7 +58,7 @@ export default function TimeOffEntriesFormScreen({ navigation }) {
   }
 
   return (
-    <Layout>
+    <Layout style={styles.layout}>
       <PaddedView>
         <Text category='h1'>Book time off</Text>
         <Field>
@@ -111,6 +111,9 @@ export default function TimeOffEntriesFormScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  layout: {
+    flex: 1,
+  },
   actions: {
     flexDirection: 'row',
   }
