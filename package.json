@@ -5,7 +5,13 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "publish:staging": "expo publish --release-channel staging",
+    "publish:production": "expo publish --release-channel production",
+    "build:ios:staging": "expo build:ios --release-channel staging",
+    "build:android:staging": "expo build:android --release-channel staging",
+    "build:ios:production": "expo build:ios --release-channel production",
+    "build:android:production": "expo build:android --release-channel production"
   },
   "dependencies": {
     "@eva-design/eva": "^2.0.0",
