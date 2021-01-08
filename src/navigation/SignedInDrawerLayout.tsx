@@ -21,7 +21,7 @@ export default function SignedInDrawerLayout() {
 
   const DrawerContent = ({ navigation }) => {
 
-    const [selectedDrawerIndex, setSelectedDrawerIndex] = useState({section: 0, row: 0});
+    const [selectedDrawerIndex, setSelectedDrawerIndex] = useState<IndexPath>(new IndexPath(0));
 
     function handleDrawerSelect(index: IndexPath) {
       navigation.toggleDrawer();
