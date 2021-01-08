@@ -10,7 +10,7 @@ export default function VacationStackNavigator() {
   return (
     <Stack.Navigator 
       mode='modal'
-      initialRouteName='Vacation'
+      initialRouteName='VacationMain'
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name='VacationMain' component={VacationMainScreen} />
