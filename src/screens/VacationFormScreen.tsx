@@ -21,8 +21,9 @@ import { railsParamsDate } from '../utilities/rails_helpers';
 
 import apiClient from '../utilities/api_client';
 import StandardScreenLayout from '../components/StandardScreenLayout';
+import { VacationFormScreenProps } from '../utilities/types_and_interfaces';
 
-export default function TimeOffEntriesFormScreen({ navigation }) {
+export default function TimeOffEntriesFormScreen({ navigation }: VacationFormScreenProps) {
 
   const [range, setRange] = useState({});
   const [submitting, setSubmitting] = useState(false);

@@ -5,8 +5,9 @@ import api_client from '../utilities/api_client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import UpdateSignedInContext from '../contexts/UpdateSignedInContext';
+import { SigninScreenProps } from '../utilities/types_and_interfaces';
 
-export default function SignInScreen({ onSignIn }) {
+export default function SignInScreen(props: SigninScreenProps) {
   const [email, setEmail]: [email: string, setEmail: any] = useState('');
   const [password, setPassword]: [password: string, setPassword: any] = useState('');
 

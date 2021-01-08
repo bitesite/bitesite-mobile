@@ -4,15 +4,16 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import DashboardScreen from '../screens/DashboardScreen';
 import NewsScreen from '../screens/NewsScreen';
-import VacationNavigator from '../navigation/VacationNavigator';
+import VacationStackNavigator from '../navigation/VacationStackNavigator';
 import AccountScreen from '../screens/AccountScreen';
 
 import { SafeAreaView } from 'react-native';
 import { Drawer, DrawerItem, IndexPath } from '@ui-kitten/components';
 
 import UpdateSignedInContext from '../contexts/UpdateSignedInContext';
+import { SignedInDrawerParamList } from '../utilities/types_and_interfaces';
 
-const DrawerNavigator = createDrawerNavigator();
+const DrawerNavigator = createDrawerNavigator<SignedInDrawerParamList>();
 
 export default function SignedInDrawerLayout() {
   
@@ -69,7 +70,7 @@ export default function SignedInDrawerLayout() {
       initialRouteName="Dashboard">
       <DrawerNavigator.Screen name="Dashboard" component={DashboardScreen} />
       <DrawerNavigator.Screen name="News" component={NewsScreen} />
-      <DrawerNavigator.Screen name="Vacation" component={VacationNavigator} />
+      <DrawerNavigator.Screen name="Vacation" component={VacationStackNavigator} />
       <DrawerNavigator.Screen name="Account" component={AccountScreen} />
     </DrawerNavigator.Navigator>
   );

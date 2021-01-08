@@ -3,8 +3,9 @@ import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { Layout, Card, List, Text } from '@ui-kitten/components';
 import ScreenHeader from '../components/ScreenHeader';
 import apiClient from '../utilities/api_client';
+import { NewsScreenProps } from '../utilities/types_and_interfaces';
 
-export default function SettingsScreen({ navigation }) {
+export default function SettingsScreen({ navigation }: NewsScreenProps) {
 
   const [newsPosts, setNewsPosts] = useState([]);
   const [offset, setOffset] = useState(0);

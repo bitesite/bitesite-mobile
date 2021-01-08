@@ -2,10 +2,11 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import VacationMainScreen from '../screens/VacationMainScreen';
 import VacationFormScreen from '../screens/VacationFormScreen';
+import { VacationStackParamList } from '../utilities/types_and_interfaces';
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<VacationStackParamList>();
 
-export default function VacationNavigator() {
+export default function VacationStackNavigator() {
   return (
     <Stack.Navigator 
       mode='modal'

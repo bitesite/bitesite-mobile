@@ -5,8 +5,9 @@ import ScreenHeader from '../components/ScreenHeader';
 import apiClient from '../utilities/api_client';
 import StandardScreenLayout from '../components/StandardScreenLayout';
 import { Calendar } from 'react-native-calendars';
+import { VacationMainScreenProps } from '../utilities/types_and_interfaces';
 
-export default function VacationScreen({ navigation }) {
+export default function VacationScreen({ navigation }: VacationMainScreenProps) {
 
   const theme = useTheme();
 

@@ -10,6 +10,7 @@ import SignedInContext from '../contexts/SignedInContext';
 
 import SignInScreen from '../screens/SignInScreen';
 import SignedInDrawerLayout from './SignedInDrawerLayout';
+import { SignedOutStackParamList } from '../utilities/types_and_interfaces';
 
 export default function AuthorizationSwitcher() {
   const [checkingStatus, setCheckingStatus] = useState(true);
@@ -41,7 +42,7 @@ export default function AuthorizationSwitcher() {
     checkSignIn();
   }, []);
 
-  const Stack = createStackNavigator();
+  const SignedOutStack = createStackNavigator<SignedOutStackParamList>();
 
   return (
     checkingStatus ?
@@ -52,9 +53,9 @@ export default function AuthorizationSwitcher() {
       signedIn ?
         <SignedInDrawerLayout />
       :
-        <Stack.Navigator>
-          <Stack.Screen name='Signin' component={SignInScreen} options={{headerShown: false}}/>
-        </Stack.Navigator>
+        <SignedOutStack.Navigator>
+          <SignedOutStack.Screen name='Signin' component={SignInScreen} options={{headerShown: false}}/>
+        </SignedOutStack.Navigator>
   );
 }
 
