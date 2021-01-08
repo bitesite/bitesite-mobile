@@ -1,6 +1,11 @@
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+// Screens
+type SignedOutStackParamList = {
+  Signin: undefined,
+}
+
 type SignedInDrawerParamList = {
   Dashboard: undefined,
   News: undefined,
@@ -12,6 +17,9 @@ type VacationStackParamList = {
   VacationMain: undefined,
   VacationForm: undefined,
 }
+
+type SigninScreenNavigationProp = StackNavigationProp<SignedOutStackParamList, 'Signin'>;
+type SigninScreenProps = { navigation: SigninScreenProps };
 
 type AccountScreenNavigationProp = DrawerNavigationProp<SignedInDrawerParamList, 'Account'>;
 type AccountScreenProps = { navigation: AccountScreenNavigationProp };
@@ -31,9 +39,10 @@ type VacationMainScreenProps = { navigation: VacationMainScreenNavigationProp };
 type VacationFormScreenNavigationProp = StackNavigationProp<SignedInDrawerParamList, 'VacationForm'>;
 type VacationFormScreenProps = { navigation: VacationFormScreenNavigationProp };
 
-
 export { 
+  SignedOutStackParamList,
   SignedInDrawerParamList,
+  SigninScreenProps,
   VacationStackParamList,
   AccountScreenProps,
   DashboardScreenProps,
