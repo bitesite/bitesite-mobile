@@ -4,6 +4,7 @@ import { Button, Card, List, Text, useTheme } from '@ui-kitten/components';
 import ScreenHeader from '../components/ScreenHeader';
 import apiClient from '../utilities/api_client';
 import StandardScreenLayout from '../components/StandardScreenLayout';
+import { Calendar } from 'react-native-calendars';
 
 export default function VacationScreen({ navigation }) {
 
@@ -11,56 +12,32 @@ export default function VacationScreen({ navigation }) {
 
   const [refreshing, setRefreshing] = React.useState(false);
   const [timeOffEntries, setTimeOffEntries] = useState([]);
-  const [offset, setOffset] = useState(0);
-  const pageSize = 20;
-
+  
   function loadTimeOffEntries() {
-    apiClient.get(`/time_off_entries?limit=${pageSize}&offset=${offset}`)
+    apiClient.get(`/time_off_entries`)
     .then((response) => {
-      setTimeOffEntries([...timeOffEntries, ...response.data]);
+      setTimeOffEntries(response.data);
       setRefreshing(false);
     })
-  }
-
-  function renderNewsItem({ item: timeOffEntry }) {
-
-    let statusColor;
-    switch(timeOffEntry.status) {
-      case 'Pending':
-        statusColor = theme['color-warning-default'];
-        break;
-      case 'Approved':
-        statusColor = theme['color-success-default'];
-        break;
-    }
-
-    return (
-      <Card style={styles.timeOffEntryCard}>
-        <View style={styles.timeOffEntryCardBody}>
-          <View style={{...styles.timeOffEntryStatus, backgroundColor: statusColor}} />
-          <Text>{timeOffEntry.entry_date}</Text>
-        </View>
-        <Text style={styles.timeOffEntryNotes}appearance='hint'>{timeOffEntry.notes}</Text>
-      </Card>
-    );
-  }
-
-  function handleListEndReached() {
-    setOffset(offset + pageSize);
   }
 
   function handleBookTimeOffPress() {
     navigation.navigate('VacationForm');
   }
 
-  useEffect(loadTimeOffEntries, [offset]);
   useEffect(loadTimeOffEntries, []);
 
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    loadTimeOffEntries();
-  }, []);
-
+  const markedDates = {}
+  timeOffEntries.forEach((timeOffEntry) => {
+    const marking = {marked: true};
+    if(timeOffEntry.status === 'Pending') {
+      marking.dotColor = '#BBBB66';
+    } else if(timeOffEntry.status === 'Approved') {
+      marking.dotColor = 'green';
+    }
+    
+    markedDates[timeOffEntry.entry_date] = marking;
+  });
 
   return (
     <StandardScreenLayout>
@@ -74,14 +51,8 @@ export default function VacationScreen({ navigation }) {
             Book time off
           </Button>
         </View>
-        <List
-          style={styles.timeOffEntriesList}
-          data={timeOffEntries}
-          renderItem={renderNewsItem}
-          onEndReached={handleListEndReached}
-          onEndReachedThreshold={1}
-          onRefresh={onRefresh}
-          refreshing={refreshing}
+        <Calendar 
+          markedDates={markedDates}
         />
       </View>
     </StandardScreenLayout>
