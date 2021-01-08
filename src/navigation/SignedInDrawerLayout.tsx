@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
@@ -7,11 +7,17 @@ import NewsScreen from '../screens/NewsScreen';
 import VacationStackNavigator from '../navigation/VacationStackNavigator';
 import AccountScreen from '../screens/AccountScreen';
 
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, Platform } from 'react-native';
 import { Drawer, DrawerItem, IndexPath } from '@ui-kitten/components';
 
 import UpdateSignedInContext from '../contexts/UpdateSignedInContext';
 import { SignedInDrawerParamList } from '../utilities/types_and_interfaces';
+
+import apiClient from '../utilities/api_client';
+
+import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
+import Constants from 'expo-constants';
 
 const DrawerNavigator = createDrawerNavigator<SignedInDrawerParamList>();
 
@@ -63,6 +69,46 @@ export default function SignedInDrawerLayout() {
       </Drawer>
     );
   }
+
+  const registerForPushNotificationsAsync = async () => {
+    if (Constants.isDevice) {
+      const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      return token;
+    } else {
+      alert('Must use physical device for Push Notifications');
+    }
+  
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+  };
+
+  useEffect(() => {
+    registerForPushNotificationsAsync().then((expoPushToken) => {
+      apiClient.put('/account', {
+        user: {
+          profile_attributes: {
+            expo_push_token: expoPushToken
+          }
+        }
+      });
+    });
+  }, []);
 
   return (
     <DrawerNavigator.Navigator 
