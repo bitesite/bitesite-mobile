@@ -7,8 +7,8 @@ import NewsScreen from '../screens/NewsScreen';
 import VacationStackNavigator from '../navigation/VacationStackNavigator';
 import AccountScreen from '../screens/AccountScreen';
 
-import { SafeAreaView, Platform } from 'react-native';
-import { Drawer, DrawerItem, IndexPath } from '@ui-kitten/components';
+import { SafeAreaView, Platform, View, StyleSheet } from 'react-native';
+import { Divider, Drawer, DrawerItem, IndexPath, Text, useTheme } from '@ui-kitten/components';
 
 import UpdateSignedInContext from '../contexts/UpdateSignedInContext';
 import { SignedInDrawerParamList } from '../utilities/types_and_interfaces';
@@ -18,6 +18,8 @@ import apiClient from '../utilities/api_client';
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
 import Constants from 'expo-constants';
+
+import environment from '../utilities/environment';
 
 const DrawerNavigator = createDrawerNavigator<SignedInDrawerParamList>();
 
@@ -57,8 +59,24 @@ export default function SignedInDrawerLayout() {
       }
     }
 
+    const DrawerFooter = () => {
+      const theme = useTheme();
+      return (
+        <>
+          <Divider />
+          <View style={styles.drawerFooterView}>
+            <Text category='label' style={{color: theme['color-primary-300']}}>{environment.name}</Text>
+          </View>
+        </>
+      );
+    }
+
     return (
-      <Drawer onSelect={handleDrawerSelect} selectedIndex={selectedDrawerIndex}>
+      <Drawer
+        onSelect={handleDrawerSelect}
+        selectedIndex={selectedDrawerIndex}
+        footer={DrawerFooter}
+      >
         <SafeAreaView>
           <DrawerItem title='Dashboard' />
           <DrawerItem title='News' />
@@ -85,7 +103,7 @@ export default function SignedInDrawerLayout() {
       const token = (await Notifications.getExpoPushTokenAsync()).data;
       return token;
     } else {
-      alert('Must use physical device for Push Notifications');
+      console.info('Must use physical device for Push Notifications');
     }
   
     if (Platform.OS === 'android') {
@@ -121,3 +139,9 @@ export default function SignedInDrawerLayout() {
     </DrawerNavigator.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  drawerFooterView: {
+    padding: 10,
+  },
+});
