@@ -36,7 +36,7 @@ type VacationScreenProps = { navigation: VacationScreenNavigationProp };
 type VacationMainScreenNavigationProp = StackNavigationProp<VacationStackParamList, 'VacationMain'>;
 type VacationMainScreenProps = { navigation: VacationMainScreenNavigationProp };
 
-type VacationFormScreenNavigationProp = StackNavigationProp<SignedInDrawerParamList, 'VacationForm'>;
+type VacationFormScreenNavigationProp = StackNavigationProp<VacationStackParamList, 'VacationForm'>;
 type VacationFormScreenProps = { navigation: VacationFormScreenNavigationProp };
 
 export { 

@@ -6,7 +6,6 @@ import apiClient from '../utilities/api_client';
 import { NewsScreenProps } from '../utilities/types_and_interfaces';
 
 export default function SettingsScreen({ navigation }: NewsScreenProps) {
-
   const [newsPosts, setNewsPosts] = useState([]);
   const [offset, setOffset] = useState(0);
   const pageSize = 20;
