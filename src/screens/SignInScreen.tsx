@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Text, Layout, Button, Input } from '@ui-kitten/components';
 import api_client from '../utilities/api_client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,7 +10,7 @@ import { SigninScreenProps } from '../utilities/types_and_interfaces';
 import LottieView from 'lottie-react-native';
 
 export default function SignInScreen(props: SigninScreenProps) {  
-  let animation;
+  let animation: LottieView | null;
   const [email, setEmail]: [email: string, setEmail: any] = useState('');
   const [password, setPassword]: [password: string, setPassword: any] = useState('');
   const updateSignedIn = useContext(UpdateSignedInContext);
@@ -36,36 +36,42 @@ export default function SignInScreen(props: SigninScreenProps) {
   }
 
   useEffect(() => {
-    animation.play();
+    if(animation) {
+      animation.play();
+    }
   }, []);
 
   return (
     <Layout style={styles.layout}>
-      <LottieView
-        ref={(animationRef) => {
-          animation = animationRef;
-        }}
-        style={{
-          width: 200,
-          height: 200,
-        }}
-        source={require('../../assets/lf30_editor_s1i0him3.json')}
-      />
-      <Text style={styles.slogan} category='h1'>Welcome</Text>
-      <Text style={styles.subslogan}>Let's get started</Text>
-      <Input 
-        placeholder='Email'
-        size='large'
-        autoCapitalize='none'
-        onChangeText={(value) => setEmail(value)}
-      />
-      <Input 
-        placeholder='Password'
-        size='large'
-        secureTextEntry={true}
-        onChangeText={(value) => setPassword(value)} 
-      />
-      <Button onPress={submitForm}>Sign in</Button>
+      <View style={styles.animationContainer}>
+        <LottieView
+          ref={(animationRef) => {
+            animation = animationRef;
+          }}
+          style={{
+            width: 200,
+            height: 200,
+          }}
+          source={require('../../assets/34526-coding-in-office.json')}
+        />
+      </View>
+      <View style={styles.form}>
+        <Text style={styles.slogan} category='h1'>Welcome</Text>
+        <Text style={styles.subslogan}>Let's get started</Text>
+        <Input 
+          placeholder='Email'
+          size='large'
+          autoCapitalize='none'
+          onChangeText={(value) => setEmail(value)}
+        />
+        <Input 
+          placeholder='Password'
+          size='large'
+          secureTextEntry={true}
+          onChangeText={(value) => setPassword(value)} 
+        />
+        <Button onPress={submitForm}>Sign in</Button>
+      </View>
     </Layout>
   );
 }
@@ -75,6 +81,13 @@ const styles = StyleSheet.create({
     flex: 1, 
     paddingHorizontal: 16,
     marginTop: 20,
+    alignItems: 'stretch',
+  },
+  animationContainer: {
+    marginTop: 80,
+    alignItems: 'flex-end',
+  },
+  form: {
     alignItems: 'flex-start',
   },
   slogan: {
@@ -82,5 +95,5 @@ const styles = StyleSheet.create({
   },
   subslogan: {
     marginBottom: 10,
-  }
+  },
 });
