@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { Spinner } from '@ui-kitten/components';
 
 import api_client from '../utilities/api_client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -47,7 +48,8 @@ export default function AuthorizationSwitcher() {
   return (
     checkingStatus ?
       <View style={styles.loadingView}>
-        <Text>One second...</Text>
+        <Spinner />
+        <Text style={styles.loadingText}>One second...</Text>
       </View>
     :
       signedIn ?
@@ -64,5 +66,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  }
+  },
+  loadingText: {
+    marginTop: 20,
+  },
 });
