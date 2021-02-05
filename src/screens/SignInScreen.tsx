@@ -26,7 +26,6 @@ export default function SignInScreen(props: SigninScreenProps) {
     )
     .then((response) => {
       const authToken = response.data.auth_token;
-      setSigningIn(false);
       AsyncStorage.setItem('@auth_token', authToken).then(() => {
         api_client.defaults.headers.common['Authorization'] = authToken;
         updateSignedIn(true);
