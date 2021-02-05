@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Text, Layout, Button, Input } from '@ui-kitten/components';
+import { StyleSheet, View, Alert } from 'react-native';
+import { Text, Layout, Button, Input, Spinner } from '@ui-kitten/components';
 import api_client from '../utilities/api_client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -13,9 +13,11 @@ export default function SignInScreen(props: SigninScreenProps) {
   let animation: LottieView | null;
   const [email, setEmail]: [email: string, setEmail: any] = useState('');
   const [password, setPassword]: [password: string, setPassword: any] = useState('');
+  const [signingIn, setSigningIn]: [signingIn: boolean, setSigningIn: any] = useState(false);
   const updateSignedIn = useContext(UpdateSignedInContext);
 
   function submitForm() {
+    setSigningIn(true);
     api_client.post(
       'sessions', 
       { 
@@ -24,6 +26,7 @@ export default function SignInScreen(props: SigninScreenProps) {
     )
     .then((response) => {
       const authToken = response.data.auth_token;
+      setSigningIn(false);
       AsyncStorage.setItem('@auth_token', authToken).then(() => {
         api_client.defaults.headers.common['Authorization'] = authToken;
         updateSignedIn(true);
@@ -31,7 +34,8 @@ export default function SignInScreen(props: SigninScreenProps) {
     })
     .catch((error) => {
       // TODO: Not signed in
-      console.log('sign in failed');
+      setSigningIn(false);
+      Alert.alert('Sign in failed.');
     });
   }
 
@@ -62,6 +66,7 @@ export default function SignInScreen(props: SigninScreenProps) {
           placeholder='Email'
           size='large'
           autoCapitalize='none'
+          autoCorrect={false}
           onChangeText={(value) => setEmail(value)}
         />
         <Input 
@@ -70,7 +75,14 @@ export default function SignInScreen(props: SigninScreenProps) {
           secureTextEntry={true}
           onChangeText={(value) => setPassword(value)} 
         />
-        <Button onPress={submitForm}>Sign in</Button>
+        <Button onPress={submitForm}>
+          {
+            signingIn ?
+              <Spinner status='basic' size='small' />
+            :
+              'Sign in'
+          }
+        </Button>
       </View>
     </Layout>
   );
