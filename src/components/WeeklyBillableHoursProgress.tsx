@@ -20,15 +20,23 @@ function WeeklyBillableHoursProgress() {
   function authorizeFreshbooks() {
     
     setLaunchingFreshbooksLogin(true);
-    freshbooks_api_client.authorize(() => {
+    freshbooks_api_client.authorize()
+    .then(() => {
       checkFreshbooksAuth();
-    });
+    })
+    .catch(() => {
+      console.log("Authorize error!");
+    });;
   }
 
   function checkFreshbooksAuth() {
-    freshbooks_api_client.checkAuthorization(() => {
+    freshbooks_api_client.checkAuthorization()
+    .then(() => {
       setFreshbooksAuthorized(freshbooks_api_client.authorized);
       setCheckingFreshbooksAuth(false);
+    })
+    .catch(() => {
+      console.log('Check auth error');
     });
   }
 
