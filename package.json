@@ -41,7 +41,8 @@
     "react-native-svg": "12.1.0",
     "react-native-web": "~0.13.12",
     "expo-app-auth": "~9.3.0",
-    "expo-linking": "~2.0.1"
+    "expo-linking": "~2.0.1",
+    "expo-secure-store": "~9.3.0"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
