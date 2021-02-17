@@ -79,7 +79,7 @@ const freshbooks_api_client = {
 
     return authorizePromise;
   },
-  get: function(url, callback) {
+  get: function(url) {
     const internal_freshbooks_api_client = axios.create({
       baseURL: `https://api.freshbooks.com/`,
       headers: {
@@ -89,7 +89,7 @@ const freshbooks_api_client = {
       },
     });
 
-    internal_freshbooks_api_client.get(url).then(callback);
+    return internal_freshbooks_api_client.get(url);
   }
 };
 

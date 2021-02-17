@@ -4,6 +4,7 @@ import LottieView from 'lottie-react-native';
 import ProgressCircle from 'react-native-progress-circle'
 import { Button, Card, Spinner, Text, useTheme } from '@ui-kitten/components';
 import freshbooks_api_client from '../utilities/freshbooks_api_client';
+import numeral from 'numeral';
 
 function WeeklyBillableHoursProgress() {
   let animation: LottieView | null;
@@ -12,10 +13,9 @@ function WeeklyBillableHoursProgress() {
   const [checkingFreshbooksAuth, setCheckingFreshbooksAuth] = useState(false);
   const [launchingFreshbooksLogin, setLaunchingFreshbooksLogin] = useState(false);
   const [freshbooksAuthorized, setFreshbooksAuthorized] = useState(false);
+  const [currentWeeklyBillableHours, setCurrentWeeklyBillableHours] = useState(0);
 
-  const currentWeeklyBillableHours = 19;
-  const weeklyBillableHoursTarget = 24;
-  const percentage = currentWeeklyBillableHours / weeklyBillableHoursTarget * 100.00;
+  
 
   function authorizeFreshbooks() {
     
@@ -42,8 +42,18 @@ function WeeklyBillableHoursProgress() {
 
   useEffect(() => {
     if(freshbooksAuthorized) {
-      freshbooks_api_client.get('/test', (response) => {
-        console.log(response.data);
+      freshbooks_api_client.get('/auth/api/v1/users/me')
+      .then((response) => {
+        return response.data.response.business_memberships[0].business.id;
+      })
+      .then((businessId) => {
+        return freshbooks_api_client.get(`timetracking/business/${businessId}/time_entries?started_from=2021-02-15T04%3A00%3A00Z`);
+      })
+      .then((response) => {
+        setCurrentWeeklyBillableHours(response.data.meta.total_logged / 60 / 60);
+      })
+      .catch((error) => {
+        console.log(error);
       });
     }
   }, [freshbooksAuthorized]);
@@ -57,6 +67,10 @@ function WeeklyBillableHoursProgress() {
       animation.play();
     }
   }, []);
+
+
+  const weeklyBillableHoursTarget = 24;
+  const percentage = currentWeeklyBillableHours / weeklyBillableHoursTarget * 100.00;
 
   return (
     <Card style={styles.card} appearance='outline'>
@@ -82,7 +96,9 @@ function WeeklyBillableHoursProgress() {
             />
 
           :
-            <Text style={styles.progressText}>{`${currentWeeklyBillableHours}/${weeklyBillableHoursTarget}`}</Text>
+            <Text style={styles.progressText}>
+              {`${numeral(currentWeeklyBillableHours).format('0.0')}/${weeklyBillableHoursTarget}`}
+            </Text>
         }
       </ProgressCircle>
       <Text style={styles.bhtCaption}>WBHT</Text>
