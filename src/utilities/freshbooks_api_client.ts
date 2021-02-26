@@ -66,28 +66,30 @@ function internalAuthorize(refreshToken) {
 
 }
 
-const freshbooks_api_client = {
-  getFreshbooksAuth: function() {
-    const getFreshbooksAuthPromise = new Promise((resolve, reject) => {
-      SecureStore.getItemAsync(FRESHBOOKS_AUTH_KEY)
-      .then((data) => {
-        if(data) {
-          const freshbooksAuthObject = JSON.parse(data);
-          resolve(freshbooksAuthObject);
-        } else {
-          reject('Could not find freshbooks auth object');
-        }
-      })
-      .catch((error) => {
-        reject(error);
-      })
-    });
+function getFreshbooksAuth() {
 
-    return getFreshbooksAuthPromise;
-  },
+  const getFreshbooksAuthPromise = new Promise((resolve, reject) => {
+    SecureStore.getItemAsync(FRESHBOOKS_AUTH_KEY)
+    .then((data) => {
+      if(data) {
+        const freshbooksAuthObject = JSON.parse(data);
+        resolve(freshbooksAuthObject);
+      } else {
+        reject('Could not find freshbooks auth object');
+      }
+    })
+    .catch((error) => {
+      reject(error);
+    })
+  });
+
+  return getFreshbooksAuthPromise;
+};
+
+const freshbooks_api_client = {
   checkAuthorization: function() {
     const checkAuthorizationPromise = new Promise((resolve) => {
-      this.getFreshbooksAuth()
+      getFreshbooksAuth()
       .then((freshbooksAuthObject) => {
 
         if(moment().isAfter(freshbooksAuthObject.accessTokenExpirationDate)) {
@@ -133,7 +135,7 @@ const freshbooks_api_client = {
   get: function(url) {
 
     const getPromise = new Promise((resolve, reject) => {
-      this.getFreshbooksAuth()
+      getFreshbooksAuth()
       .then((freshbooksAuthObject) => {
         const internalFreshbooksApiClient = axios.create({
           baseURL: `https://api.freshbooks.com/`,
