@@ -1,24 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
-import LottieView from 'lottie-react-native';
-import ProgressCircle from 'react-native-progress-circle'
+import { StyleSheet, View } from 'react-native';
 import { Button, Card, Spinner, Text, useTheme } from '@ui-kitten/components';
 import freshbooks_api_client from '../utilities/freshbooks_api_client';
 import numeral from 'numeral';
+import moment from 'moment';
+import StyledProgressCircle from './StyledProgressCircle';
 
 function WeeklyBillableHoursProgress() {
-  let animation: LottieView | null;
+  
   const theme = useTheme();
 
   const [checkingFreshbooksAuth, setCheckingFreshbooksAuth] = useState(false);
   const [launchingFreshbooksLogin, setLaunchingFreshbooksLogin] = useState(false);
   const [freshbooksAuthorized, setFreshbooksAuthorized] = useState(false);
+  const [loadingCurrentWeeklyBillableHours, setLoadingCurrentWeeklyBillableHours] = useState(true);
   const [currentWeeklyBillableHours, setCurrentWeeklyBillableHours] = useState(0);
 
-  
-
   function authorizeFreshbooks() {
-    
     setLaunchingFreshbooksLogin(true);
     freshbooks_api_client.authorize()
     .then(() => {
@@ -30,12 +28,13 @@ function WeeklyBillableHoursProgress() {
   }
 
   function checkFreshbooksAuth() {
+    setCheckingFreshbooksAuth(true);
     freshbooks_api_client.checkAuthorization()
-    .then(() => {
-      setFreshbooksAuthorized(freshbooks_api_client.authorized);
+    .then((authorized) => {
+      setFreshbooksAuthorized(authorized);
       setCheckingFreshbooksAuth(false);
     })
-    .catch(() => {
+    .catch((error) => {
       console.log('Check auth error');
     });
   }
@@ -44,16 +43,18 @@ function WeeklyBillableHoursProgress() {
     if(freshbooksAuthorized) {
       freshbooks_api_client.get('/auth/api/v1/users/me')
       .then((response) => {
+        // Assume first business
         return response.data.response.business_memberships[0].business.id;
       })
       .then((businessId) => {
-        return freshbooks_api_client.get(`timetracking/business/${businessId}/time_entries?started_from=2021-02-15T04%3A00%3A00Z`);
+        return freshbooks_api_client.get(`timetracking/business/${businessId}/time_entries?started_from=${moment().startOf('week')}`);
       })
       .then((response) => {
         setCurrentWeeklyBillableHours(response.data.meta.total_logged / 60 / 60);
+        setLoadingCurrentWeeklyBillableHours(false);
       })
       .catch((error) => {
-        console.log(error);
+        console.log(`ERROR: ${error}`);
       });
     }
   }, [freshbooksAuthorized]);
@@ -62,49 +63,33 @@ function WeeklyBillableHoursProgress() {
     checkFreshbooksAuth();
   }, []);
 
-  useEffect(() => {
-    if(animation) {
-      animation.play();
-    }
-  }, []);
-
-
-  const weeklyBillableHoursTarget = 24;
+  const weeklyBillableHoursTarget = 20;
   const percentage = currentWeeklyBillableHours / weeklyBillableHoursTarget * 100.00;
 
   return (
     <Card style={styles.card} appearance='outline'>
-      <ProgressCircle
-          percent={percentage}
-          radius={100}
-          borderWidth={12}
-          color={theme['color-primary-300']}
-          shadowColor={theme['color-primary-900']}
-          bgColor={theme['color-primary-900']}
-      >
-        {
-          percentage >= 100 ?
-            <LottieView
-              ref={(animationRef) => {
-                animation = animationRef;
-              }}
-              style={{
-                width: 200,
-                height: 200,
-              }}
-              source={require('../../assets/9651-winner.json')}
-            />
-
+      {
+        checkingFreshbooksAuth ?
+          <View style={styles.progressCircleSpinnerContainer}>
+            <Spinner size='giant' />
+          </View>
+        :
+          !freshbooksAuthorized ?
+            <View style={styles.placeHolderProgressCircle}></View>
           :
-            <Text style={styles.progressText}>
-              {`${numeral(currentWeeklyBillableHours).format('0.0')}/${weeklyBillableHoursTarget}`}
-            </Text>
-        }
-      </ProgressCircle>
+            loadingCurrentWeeklyBillableHours ?
+              <View style={styles.progressCircleSpinnerContainer}>
+                <Spinner size='giant' />
+              </View>
+            :
+              <StyledProgressCircle percentage={percentage} text={`${numeral(currentWeeklyBillableHours).format('0.0')}/${weeklyBillableHoursTarget}`} />
+      }
       <Text style={styles.bhtCaption}>WBHT</Text>
       {
         checkingFreshbooksAuth ?
-          <Spinner />
+          <View style={styles.checkingFreshbooksAuthSpinnerContainer}>
+            <Spinner />
+          </View>
         :
           !freshbooksAuthorized &&
           <Button onPress={authorizeFreshbooks}>
@@ -128,9 +113,21 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontWeight: 'bold',
   },
-  progressText: {
-    fontSize: 32,
-    color: 'white',
+  progressCircleSpinnerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 200,
+    width: 200,
+  },
+  checkingFreshbooksAuthSpinnerContainer: {
+    alignItems: 'center',
+    width: 200,
+  },
+  placeHolderProgressCircle: {
+    backgroundColor: '#eeeeee',
+    width: 200,
+    height: 200,
+    borderRadius: 200,
   }
 });
 
