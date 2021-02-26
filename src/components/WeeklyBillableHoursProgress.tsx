@@ -5,6 +5,7 @@ import freshbooks_api_client from '../utilities/freshbooks_api_client';
 import numeral from 'numeral';
 import moment from 'moment';
 import StyledProgressCircle from './StyledProgressCircle';
+import apiClient from '../utilities/api_client';
 
 function WeeklyBillableHoursProgress() {
   
@@ -15,6 +16,7 @@ function WeeklyBillableHoursProgress() {
   const [freshbooksAuthorized, setFreshbooksAuthorized] = useState(false);
   const [loadingCurrentWeeklyBillableHours, setLoadingCurrentWeeklyBillableHours] = useState(true);
   const [currentWeeklyBillableHours, setCurrentWeeklyBillableHours] = useState(0);
+  const [weeklyBillableHoursTarget, setWeeklyBillableHoursTarget] = useState();
 
   function authorizeFreshbooks() {
     setLaunchingFreshbooksLogin(true);
@@ -36,6 +38,20 @@ function WeeklyBillableHoursProgress() {
     })
     .catch((error) => {
       console.log('Check auth error');
+    });
+  }
+
+  function loadWeeklyBillableHoursTarget() {
+    apiClient.get('/profile').then((response) => {
+      if(isNaN(response.data.weekly_billable_hours_target)) {
+
+      } else {
+        setWeeklyBillableHoursTarget(response.data.weekly_billable_hours_target);
+      }
+    })
+    .catch((error) => {
+      console.log("Could not fetch profile.");
+      console.log(error);
     });
   }
 
@@ -61,9 +77,9 @@ function WeeklyBillableHoursProgress() {
 
   useEffect(() => {
     checkFreshbooksAuth();
+    loadWeeklyBillableHoursTarget();
   }, []);
 
-  const weeklyBillableHoursTarget = 20;
   const percentage = currentWeeklyBillableHours / weeklyBillableHoursTarget * 100.00;
 
   return (
@@ -74,7 +90,7 @@ function WeeklyBillableHoursProgress() {
             <Spinner size='giant' />
           </View>
         :
-          !freshbooksAuthorized ?
+          !freshbooksAuthorized || !weeklyBillableHoursTarget ?
             <View style={styles.placeHolderProgressCircle}></View>
           :
             loadingCurrentWeeklyBillableHours ?
@@ -125,6 +141,8 @@ const styles = StyleSheet.create({
   },
   placeHolderProgressCircle: {
     backgroundColor: '#eeeeee',
+    borderStyle: 'dashed',
+    borderWidth: 2,
     width: 200,
     height: 200,
     borderRadius: 200,
