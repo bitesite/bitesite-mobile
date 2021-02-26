@@ -67,8 +67,6 @@ function internalAuthorize(refreshToken) {
 }
 
 const freshbooks_api_client = {
-  authorized: false,
-  accessToken: '',
   getFreshbooksAuth: function() {
     const getFreshbooksAuthPromise = new Promise((resolve, reject) => {
       SecureStore.getItemAsync(FRESHBOOKS_AUTH_KEY)
