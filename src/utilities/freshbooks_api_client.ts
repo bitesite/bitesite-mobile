@@ -6,53 +6,64 @@ import * as SecureStore from 'expo-secure-store';
 import moment from 'moment';
 import apiClient from './api_client';
 
-function authorize(refreshToken) {
-  let authState;
+const FRESHBOOKS_AUTH_KEY = 'freshbooks_auth';
 
-  apiClient.get('/settings')
-    .then(({ data: settings }) => {
-      
-      let freshbooksApiClientId;
-      let freshbooksApiClientSecret;
+function internalAuthorize(refreshToken) {
+  
+  const internalAuthorizePromise = new Promise((resolve, reject) => {
+    let authState;
 
-      settings.forEach((setting) => {
-        if(setting.name === 'freshbooks_api_client_id') {
-          freshbooksApiClientId = setting.value;
-        }
+    apiClient.get('/settings')
+      .then(({ data: settings }) => {
         
-        if(setting.name === 'freshbooks_api_client_secret') {
-          freshbooksApiClientSecret = setting.value;
+        let freshbooksApiClientId;
+        let freshbooksApiClientSecret;
+  
+        settings.forEach((setting) => {
+          if(setting.name === 'freshbooks_api_client_id') {
+            freshbooksApiClientId = setting.value;
+          }
+          
+          if(setting.name === 'freshbooks_api_client_secret') {
+            freshbooksApiClientSecret = setting.value;
+          }
+        });
+        
+        const redirectUri = Linking.makeUrl('/auth/redirect');
+        const config = {
+          serviceConfiguration: {
+            authorizationEndpoint: `https://auth.freshbooks.com/service/auth/oauth/authorize?response_type=code`,
+            tokenEndpoint: 'https://api.freshbooks.com/auth/oauth/token'
+          },
+          redirectUrl: redirectUri,
+          clientId: freshbooksApiClientId,
+          clientSecret: freshbooksApiClientSecret,
+          scopes: [],
+        };
+  
+        if(refreshToken) {
+          console.log("Attempt to refresh token...");
+          return AppAuth.refreshAsync(config, refreshToken);
+        } else {
+          return AppAuth.authAsync(config);
         }
+      })
+      .then((returnedAuthState) => {
+        authState = returnedAuthState;
+        return SecureStore.setItemAsync(FRESHBOOKS_AUTH_KEY, JSON.stringify(authState));
+      })
+      .then(() => {
+        resolve(authState);
+      })
+      .catch(() => {
+        SecureStore.deleteItemAsync(FRESHBOOKS_AUTH_KEY).then(() => {
+          resolve();
+        });
       });
-      
-      const redirectUri = Linking.makeUrl('/auth/redirect');
-      const config = {
-        serviceConfiguration: {
-          authorizationEndpoint: `https://auth.freshbooks.com/service/auth/oauth/authorize?response_type=code`,
-          tokenEndpoint: 'https://api.freshbooks.com/auth/oauth/token'
-        },
-        redirectUrl: redirectUri,
-        clientId: freshbooksApiClientId,
-        clientSecret: freshbooksApiClientSecret,
-        scopes: [],
-      };
+  });
 
-      if(refreshToken) {
-        return AppAuth.refreshAsync(config, refreshToken);
-      } else {
-        return AppAuth.authAsync(config);
-      }
-    })
-    .then((authState) => {
-      return SecureStore.setItemAsync('freshbooks_auth', JSON.stringify(authState));
-    })
-    .then(() => {
-      return authState;
-    })
-    .catch(() => {
-      SecureStore.deleteItemAsync('freshbooks_auth');
-      return;
-    });
+  return internalAuthorizePromise;
+
 }
 
 const freshbooks_api_client = {
@@ -60,7 +71,7 @@ const freshbooks_api_client = {
   accessToken: '',
   getFreshbooksAuth: function() {
     const getFreshbooksAuthPromise = new Promise((resolve, reject) => {
-      SecureStore.getItemAsync('freshbooks_auth')
+      SecureStore.getItemAsync(FRESHBOOKS_AUTH_KEY)
       .then((data) => {
         if(data) {
           const freshbooksAuthObject = JSON.parse(data);
@@ -77,21 +88,24 @@ const freshbooks_api_client = {
     return getFreshbooksAuthPromise;
   },
   checkAuthorization: function() {
-    const checkAuthorizationPromise = new Promise((resolve, reject) => {
+    const checkAuthorizationPromise = new Promise((resolve) => {
       this.getFreshbooksAuth()
       .then((freshbooksAuthObject) => {
+
         if(moment().isAfter(freshbooksAuthObject.accessTokenExpirationDate)) {
-          const authState = authorize(freshbooksAuthObject.refreshToken);
+          
+          internalAuthorize(freshbooksAuthObject.refreshToken).then((authState) => {
+            if(authState) {
+              console.log("Freshbooks Token refreshed.");
+              resolve(true);
+            } else {
+              console.log("No Freshbooks Token found.");
+              resolve(false);
+            }
+          });
   
-          if(authState) {
-            console.log("Token refreshed.");
-            resolve(true);
-          } else {
-            console.log("No token found.");
-            resolve(false);
-          }
         } else {
-          console.log("Active token.");
+          console.log("Freshbooks token active.");
           resolve(true);
         }
       })
@@ -106,13 +120,14 @@ const freshbooks_api_client = {
 
     const authorizePromise = new Promise((resolve, reject) => {
 
-      const authState = authorize();
+      internalAuthorize().then((authState) => {
+        if(authState) {        
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      });
 
-      if(authState) {        
-        resolve(true);
-      } else {
-        resolve(false);
-      }
     });
 
     return authorizePromise;
@@ -122,7 +137,7 @@ const freshbooks_api_client = {
     const getPromise = new Promise((resolve, reject) => {
       this.getFreshbooksAuth()
       .then((freshbooksAuthObject) => {
-        const internal_freshbooks_api_client = axios.create({
+        const internalFreshbooksApiClient = axios.create({
           baseURL: `https://api.freshbooks.com/`,
           headers: {
             'Accept': 'application/json',
@@ -131,7 +146,7 @@ const freshbooks_api_client = {
           },
         });
     
-        internal_freshbooks_api_client.get(url).then((response) => {
+        internalFreshbooksApiClient.get(url).then((response) => {
           resolve(response);
         })
         .catch(() => {
