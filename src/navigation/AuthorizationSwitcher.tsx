@@ -13,10 +13,18 @@ import SignInScreen from '../screens/SignInScreen';
 import SignedInDrawerLayout from './SignedInDrawerLayout';
 import { SignedOutStackParamList } from '../utilities/types_and_interfaces';
 
+import * as Linking from 'expo-linking';
+
 export default function AuthorizationSwitcher() {
   const [checkingStatus, setCheckingStatus] = useState(true);
   const updateSignedIn = useContext(UpdateSignedInContext);
   const signedIn = useContext(SignedInContext);
+
+  console.log(Linking.makeUrl('/auth/redirect'));
+  Linking.addEventListener('url', (event) => {
+    console.log('Received');
+    console.log(event.url);
+  });
 
   function checkSignIn() {
     AsyncStorage.getItem('@auth_token')
