@@ -5,6 +5,7 @@ import freshbooks_api_client from '../utilities/freshbooks_api_client';
 import numeral from 'numeral';
 import moment from 'moment';
 import StyledProgressCircle from './StyledProgressCircle';
+import PlaceholderProgressCircle from './PlaceholderProgressCircle';
 import apiClient from '../utilities/api_client';
 
 function WeeklyBillableHoursProgress() {
@@ -23,8 +24,10 @@ function WeeklyBillableHoursProgress() {
     freshbooks_api_client.authorize()
     .then(() => {
       checkFreshbooksAuth();
+      setLaunchingFreshbooksLogin(false);
     })
     .catch(() => {
+      setLaunchingFreshbooksLogin(false);
       console.log("Authorize error!");
     });;
   }
@@ -90,15 +93,18 @@ function WeeklyBillableHoursProgress() {
             <Spinner size='giant' />
           </View>
         :
-          !freshbooksAuthorized || !weeklyBillableHoursTarget ?
-            <View style={styles.placeHolderProgressCircle}></View>
+          !freshbooksAuthorized ?
+            <PlaceholderProgressCircle text={'Authorize Freshbooks'} />
           :
-            loadingCurrentWeeklyBillableHours ?
-              <View style={styles.progressCircleSpinnerContainer}>
-                <Spinner size='giant' />
-              </View>
+            !weeklyBillableHoursTarget ?
+              <PlaceholderProgressCircle text={'Please set Target'} />
             :
-              <StyledProgressCircle percentage={percentage} text={`${numeral(currentWeeklyBillableHours).format('0.0')}/${weeklyBillableHoursTarget}`} />
+              loadingCurrentWeeklyBillableHours ?
+                <View style={styles.progressCircleSpinnerContainer}>
+                  <Spinner size='giant' />
+                </View>
+              :
+                <StyledProgressCircle percentage={percentage} text={`${numeral(currentWeeklyBillableHours).format('0.0')}/${weeklyBillableHoursTarget}`} />
       }
       <Text style={styles.bhtCaption}>WBHT</Text>
       {
@@ -139,14 +145,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 200,
   },
-  placeHolderProgressCircle: {
-    backgroundColor: '#eeeeee',
-    borderStyle: 'dashed',
-    borderWidth: 2,
-    width: 200,
-    height: 200,
-    borderRadius: 200,
-  }
 });
 
 export default WeeklyBillableHoursProgress;

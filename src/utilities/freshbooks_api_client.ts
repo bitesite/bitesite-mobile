@@ -1,10 +1,11 @@
 import axios from 'axios';
-import environment from './environment';
+import Constants from 'expo-constants';
 import * as AppAuth from 'expo-app-auth';
 import * as Linking from 'expo-linking';
 import * as SecureStore from 'expo-secure-store';
 import moment from 'moment';
 import apiClient from './api_client';
+import appSettings from '../../app.json';
 
 const FRESHBOOKS_AUTH_KEY = 'freshbooks_auth';
 
@@ -29,7 +30,12 @@ function internalAuthorize(refreshToken) {
           }
         });
         
-        const redirectUri = Linking.makeUrl('/auth/redirect');
+        let redirectUri = Linking.makeUrl('auth/redirect');
+        
+        if(Constants.appOwnership === 'standalone') {
+          redirectUri = `${appSettings.expo.scheme}://auth/redirect`;
+        }
+
         const config = {
           serviceConfiguration: {
             authorizationEndpoint: `https://auth.freshbooks.com/service/auth/oauth/authorize?response_type=code`,
