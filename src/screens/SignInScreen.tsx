@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { StyleSheet, View, Alert } from 'react-native';
+import { StyleSheet, View, Alert, Platform } from 'react-native';
 import { Text, Layout, Button, Input, Spinner } from '@ui-kitten/components';
 import api_client from '../utilities/api_client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -47,16 +47,19 @@ export default function SignInScreen(props: SigninScreenProps) {
   return (
     <Layout style={styles.layout}>
       <View style={styles.animationContainer}>
-        <LottieView
-          ref={(animationRef) => {
-            animation = animationRef;
-          }}
-          style={{
-            width: 200,
-            height: 200,
-          }}
-          source={require('../../assets/34526-coding-in-office.json')}
-        />
+        {
+          Platform.OS === 'ios' &&
+          <LottieView
+            ref={(animationRef) => {
+              animation = animationRef;
+            }}
+            style={{
+              width: 200,
+              height: 200,
+            }}
+            source={require('../../assets/34526-coding-in-office.json')}
+          />
+        }
       </View>
       <View style={styles.form}>
         <Text style={styles.slogan} category='h1'>Welcome</Text>

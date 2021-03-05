@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Platform } from 'react-native';
 import ProgressCircle from 'react-native-progress-circle'
 import LottieView from 'lottie-react-native';
 import { Text, useTheme } from '@ui-kitten/components';
@@ -26,17 +26,20 @@ function StyledProgressCircle({ percentage, text }) {
         {
           percentage >= 100 ?
             <View>
-              <LottieView
-                ref={(animationRef) => {
-                  animation = animationRef;
-                }}
-                style={{
-                  width: 250,
-                  height: 250,
-                  zIndex: 2,
-                }}
-                source={require('../../assets/9651-winner.json')}
-              />
+              {
+                Platform.OS === 'ios' &&
+                <LottieView
+                  ref={(animationRef) => {
+                    animation = animationRef;
+                  }}
+                  style={{
+                    width: 250,
+                    height: 250,
+                    zIndex: 2,
+                  }}
+                  source={require('../../assets/9651-winner.json')}
+                />
+              }
               <View style={styles.completedViewProgressTextContainer}>
                 <Text style={styles.progressText}>
                   {text}
