@@ -20,10 +20,8 @@ export default function AuthorizationSwitcher() {
   const updateSignedIn = useContext(UpdateSignedInContext);
   const signedIn = useContext(SignedInContext);
 
-  console.log(Linking.makeUrl('/auth/redirect'));
   Linking.addEventListener('url', (event) => {
-    console.log('Received');
-    console.log(event.url);
+    /* Not sure if we need to keep this for Freshbooks auth */
   });
 
   function checkSignIn() {

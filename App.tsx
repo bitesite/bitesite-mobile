@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 
 import * as eva from '@eva-design/eva';
 import * as Notifications from 'expo-notifications';
-import { ApplicationProvider, IconRegistry } from '@ui-kitten/components';
+import { ApplicationProvider, IconRegistry, Button } from '@ui-kitten/components';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import { default as biteSiteTheme } from './src/themes/bitesite-theme.json';
 
@@ -15,7 +15,7 @@ import AuthorizationSwitcher from './src/navigation/AuthorizationSwitcher';
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: false,
-    shouldPlaySound: false,
+    shouldPlaySound: true,
     shouldSetBadge: false,
   }),
 });
@@ -40,6 +40,14 @@ export default function App() {
     Notifications.addNotificationResponseReceivedListener(handleNotificationResponse);
   });
 
+  useEffect(() => {
+    if(showNotification) {
+      setTimeout(() => {
+        setShowNotification(false);
+      }, 5000);
+    }
+  }, [showNotification]);
+
   return (
     <NavigationContainer>
       <IconRegistry icons={EvaIconsPack} />
@@ -50,8 +58,18 @@ export default function App() {
             <View style={styles.notificationArea}>
               <SafeAreaView>
                 <View style={styles.notificationCard}>
-                  <Text>{notification.title}</Text>
-                  <Text>{notification.body}</Text>
+                  <View style={styles.notificationText}>
+                    <Text style={styles.notificationTitle}>{notification.title}</Text>
+                    <Text style={styles.notificationBody}>{notification.body}</Text>
+                  </View>
+                  <View style={styles.notificationActions}>
+                    <Button
+                      appearance='ghost'
+                      onPress={() => setShowNotification(false)}
+                    >
+                      Dimiss
+                    </Button>
+                  </View>
                 </View>
               </SafeAreaView>
             </View>
@@ -79,5 +97,21 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 2, height: 2},
     shadowColor: 'black',
     shadowOpacity: 0.5,
-  }
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  notificationText: {
+
+  },
+  notificationActions: {
+
+  },
+  notificationTitle: {
+    fontWeight: 'bold',
+  },
+  notificationBody: {
+
+  },
+
+
 });
