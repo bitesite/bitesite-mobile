@@ -26,6 +26,10 @@ export default function VacationScreen({ navigation }: VacationMainScreenProps) 
     navigation.navigate('VacationForm');
   }
 
+  function handleReportsVacationPress() {
+    navigation.navigate('ReportsVacation');
+  }
+
   useEffect(loadTimeOffEntries, []);
 
   const markedDates = {}
@@ -44,17 +48,26 @@ export default function VacationScreen({ navigation }: VacationMainScreenProps) 
     <StandardScreenLayout>
       <ScreenHeader title='Vacation' navigation={navigation} />
       <View style={styles.screenBody}>
+        <Calendar 
+          markedDates={markedDates}
+        />
         <View style={styles.buttonContainer}>
           <Button
-            color='primary'
+            status='primary'
             onPress={handleBookTimeOffPress}
           >
             Book time off
           </Button>
         </View>
-        <Calendar 
-          markedDates={markedDates}
-        />
+        <View style={styles.buttonContainer}>
+          <Button
+            status='primary'
+            appearance='outline'
+            onPress={handleReportsVacationPress}
+          >
+            Reports Vacation
+          </Button>
+        </View>
       </View>
     </StandardScreenLayout>
   );
@@ -65,7 +78,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonContainer: {
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
   timeOffEntriesList: {
   },

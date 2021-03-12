@@ -8,6 +8,7 @@ import UpdateSignedInContext from '../contexts/UpdateSignedInContext';
 import { SigninScreenProps } from '../utilities/types_and_interfaces';
 
 import LottieView from 'lottie-react-native';
+import environment from '../utilities/environment';
 
 export default function SignInScreen(props: SigninScreenProps) {  
   let animation: LottieView | null;
@@ -86,6 +87,12 @@ export default function SignInScreen(props: SigninScreenProps) {
           }
         </Button>
       </View>
+      {
+        (environment.name === 'DEVELOPMENT' || environment.name === 'STAGING') &&
+        <View style={styles.environmentContainer}>
+          <Text style={styles.environment}>{environment.name}</Text>
+        </View>
+      }
     </Layout>
   );
 }
@@ -109,5 +116,12 @@ const styles = StyleSheet.create({
   },
   subslogan: {
     marginBottom: 10,
+  },
+  environmentContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  environment: {
+    color: '#BBB',
   },
 });
