@@ -53,8 +53,32 @@ export default function SignedInDrawerLayout() {
           return;
         }
         case 4: {
-          updateSignedIn(false);
-          return;
+
+          Permissions.getAsync(Permissions.NOTIFICATIONS)
+          .then((response) => {
+            const { status } = response;
+            if(status === 'granted') {
+              return Notifications.getExpoPushTokenAsync();
+            } else {
+              return;
+            }
+          })
+          .then((expoPushTokenResponse) => {
+            if(expoPushTokenResponse) {
+              const expoPushToken = expoPushTokenResponse.data;
+              return apiClient.put('/account/register_device', {
+                device: {
+                  push_token: expoPushToken,
+                  signed_in: false,
+                }
+              });
+            } else {
+              return;
+            }
+          })
+          .then(() => {
+            updateSignedIn(false);
+          });
         }
       }
     }
@@ -118,11 +142,12 @@ export default function SignedInDrawerLayout() {
 
   useEffect(() => {
     registerForPushNotificationsAsync().then((expoPushToken) => {
-      apiClient.put('/account', {
-        user: {
-          profile_attributes: {
-            expo_push_token: expoPushToken
-          }
+      apiClient.put('/account/register_device', {
+        device: {
+          push_token: expoPushToken,
+          os: Platform.OS,
+          os_version: Platform.Version,
+          signed_in: true,
         }
       });
     });
